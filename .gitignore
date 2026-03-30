@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+artifacts/
+_smoke/
+*.npz
+*.pt
+*.log
+
+hosp/
+icu/
+raw_data/
+
+.venv/
+.pytest_cache/
