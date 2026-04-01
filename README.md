@@ -1,136 +1,176 @@
-# Dosage Prediction And ICU Risk Forecasting With MIMIC-IV
+# 48-Hour Broad-Spectrum Antibiotic Review In MIMIC-IV
 
-## Main Question
+## What Question Are We Tackling?
 
-This repo asks a simple question:
+This project asks one clear clinical question:
 
-Can we use the first 24 hours of ICU data from MIMIC-IV to predict near-term deterioration and important clinical outcomes, and can a transformer that understands irregular medical time series do better than simpler baseline models?
+At 48 hours after starting empiric broad-spectrum antibiotics in ICU patients, is continued broad-spectrum therapy still justified?
 
-## What This Project Does
+This is meant to support antibiotic stewardship review, not to replace a doctor.
 
-This repo builds a full small research pipeline:
+The intended model output is:
 
-- it creates an adult ICU cohort from MIMIC-IV
-- it turns raw hospital events into model-ready features
-- it trains simple baseline models
-- it trains a more interesting transformer model
+- `continue broad-spectrum likely justified`
+- `high-priority candidate for de-escalation review`
 
-The current prediction tasks are:
+## Why This Question?
 
-- `vasopressor_next_6h`
-- `in_hospital_mortality`
-- `long_icu_los`
+This is a cleaner stewardship question than asking whether the very first empiric choice was correct.
 
-## What We Actually Built
+Why 48 hours:
 
-There are two model paths in the repo:
+- it matches real antibiotic review practice better than 0 hours
+- it is different from the older "early empiric appropriateness" framing
+- by 48 hours, cultures, vitals, labs, and response to treatment are more informative
 
-- Tabular baselines
-  - logistic regression
-  - random forest
-  - XGBoost
-- Sequence model
-  - a patient-specific decay transformer
+## What Data Are Available In MIMIC-IV?
 
-The transformer is the main novelty idea.
+MIMIC-IV has the main pieces needed for a first version of this project:
 
-Why it is different:
+- antibiotic administration
+  - `hosp/emar.csv`
+  - `hosp/emar_detail.csv`
+- medication orders and scheduling
+  - `hosp/pharmacy.csv`
+  - `hosp/prescriptions.csv`
+  - `hosp/poe.csv`
+- microbiology and susceptibility information
+  - `hosp/microbiologyevents.csv`
+- ICU physiology and organ support
+  - `icu/chartevents.csv.gz`
+  - `icu/inputevents.csv.gz`
+  - `icu/outputevents.csv.gz`
+- hospital labs and admission context
+  - `hosp/labevents.csv`
+  - `hosp/admissions.csv`
+  - `hosp/patients.csv`
 
-- ICU data are irregular
-- many values are missing
-- older measurements should matter less
-- the speed of that decay should depend on the patient
+So the data are available for:
 
-So instead of using one fixed decay for everyone, this model learns patient-specific decay rates from static context.
+- what antibiotic was given
+- when it was given
+- whether broad-spectrum therapy was continued
+- what cultures showed
+- how the patient was responding by 48 hours
 
-## What Data The Model Uses
+## What This Repo Contains Right Now
 
-Dynamic ICU features:
+This repo already has the core modeling scaffold:
 
-- heart rate
-- blood pressure
-- respiratory rate
-- temperature
-- SpO2
-- weight
-- creatinine
-- BUN
-- sodium
-- potassium
-- chloride
-- bicarbonate
-- glucose
-- lactate
-- WBC
-- hemoglobin
-- platelets
-- bilirubin
-- vasopressor indicator
-- urine output
-
-Static features:
-
-- age
-- sex
-- admission type
-- insurance
-- race
-- first ICU careunit
-- diagnosis count
-
-Each hour bin stores:
-
-- feature value
-- observation mask
-- observation count
-- time since last observation
-
-## What We Achieved So Far
-
-This repo already includes working code for:
-
-- cohort building
-- feature extraction
-- hourly sequence construction
-- tabular feature construction
-- baseline training
+- MIMIC-IV cohort building
+- time-series feature extraction
+- tabular baseline training
 - transformer training
+- a patient-specific decay transformer for irregular ICU data
 
-The code has been smoke-tested end to end on a small sample.
+This part is already coded and smoke-tested.
+
+## What Has Already Been Achieved
+
+The current codebase already does these things end to end:
+
+- builds a leakage-safe ICU cohort
+- creates hourly binned sequence features
+- creates tabular summary features
+- trains logistic regression, random forest, and XGBoost baselines
+- trains a transformer model
+
+So the repo is not empty or only an idea. The pipeline exists.
+
+## What Still Needs To Be Added For The Final Antibiotic Project
+
+The antibiotic-specific part is the next step.
+
+Still to implement:
+
+- define the broad-spectrum antibiotic list
+- identify empiric antibiotic start time
+- build the 48-hour review snapshot
+- define the 72-hour outcome label
+- classify `continued` versus `narrowed / stopped / switched off broad-spectrum`
+- review edge cases with a doctor or antimicrobial pharmacist
 
 That means:
 
-- the pipeline runs
-- the files connect correctly
-- the training scripts work
+- the modeling scaffold is built
+- the antibiotic stewardship label logic is the main remaining project-specific task
 
-## What This Repo Does Not Claim Yet
+## First Study Design
 
-This is important.
+The clean first version is:
 
-This repo is not yet claiming final scientific performance.
+- cohort: ICU patients started on empiric broad-spectrum antibiotics
+- input window: data available up to 48 hours after antibiotic start
+- output window: what happens by 72 hours
+
+First label:
+
+- positive class: broad-spectrum therapy is continued past the 48-hour review point
+- negative class: therapy is narrowed, stopped, or switched off broad-spectrum by 72 hours
+
+## What We Want The Model To Be
+
+This should be a clinician-facing review tool, not an automatic stop order.
+
+The most realistic use is:
+
+- flag patients for de-escalation review
+- help stewardship teams prioritize review
+- provide decision support alongside clinical judgement
+
+## Why The Modeling Approach Could Be Effective
+
+The repo compares two levels of model:
+
+- simple baselines
+- a transformer that handles irregular ICU time series better
+
+The transformer idea is still useful here because antibiotic review depends on time-varying evidence:
+
+- fever trend
+- blood pressure trend
+- lactate trend
+- white cell count trend
+- culture results appearing over time
+- changing organ support needs
+
+The patient-specific decay module is meant to help because older observations should not have equal importance for every patient.
+
+## Important Limitations
+
+This repo does not yet claim a final clinical model.
 
 Current limitations:
 
-- the smoke-test results are only sanity checks
-- full MIMIC-IV experiments still need to be run
-- there is no external validation yet
-- this is a research prototype, not a clinical tool
+- antibiotic-specific labels are not fully implemented yet
+- smoke-test results are only pipeline checks
+- there is no clinician-reviewed gold-standard label set yet
+- no external validation has been done
+- this is a research prototype, not a prescribing tool
 
-## Repo Structure
+## Best Way To Read The Repo
+
+If you are new here, think of the repo in two layers:
+
+1. already built:
+   the MIMIC-IV modeling engine
+2. next focused step:
+   the 48-hour antibiotic stewardship cohort and labels
+
+## Files
 
 - `mimic_iv_project/config.py`
-  - paths, feature definitions, task setup
-- `mimic_iv_project/feature_catalog.py`
-  - maps feature names to MIMIC item IDs
+  - paths and base feature setup
 - `mimic_iv_project/data_pipeline.py`
-  - builds cohort and model datasets
+  - cohort and dataset construction
 - `mimic_iv_project/train_baselines.py`
-  - trains logistic regression, random forest, and XGBoost
+  - tabular baselines
 - `mimic_iv_project/models.py`
-  - defines the patient-specific decay transformer
+  - patient-specific decay transformer
 - `mimic_iv_project/train_transformer.py`
-  - trains the transformer
+  - transformer training
+- `PROJECT_BRIEF.md`
+  - one-page description of the antibiotic project
 
 ## Quick Start
 
@@ -140,63 +180,30 @@ Install dependencies:
 python3 -m pip install --user -r requirements.txt
 ```
 
-Point the code to your MIMIC-IV root directory.
-
-That directory must contain:
-
-- `hosp/`
-- `icu/`
-
-You can pass it directly:
-
-```bash
-PYTHONPATH=. python3 -m mimic_iv_project.data_pipeline --build-all --raw-root /path/to/mimic_root
-```
-
-Or use the environment variable:
+Point the code to a MIMIC-IV root directory containing `hosp/` and `icu/`:
 
 ```bash
 export MIMIC_IV_ROOT=/path/to/mimic_root
-PYTHONPATH=. python3 -m mimic_iv_project.data_pipeline --build-all
 ```
 
-Build a small smoke-test sample first:
+Run a small smoke build:
 
 ```bash
-PYTHONPATH=. python3 -m mimic_iv_project.data_pipeline --build-all --raw-root /path/to/mimic_root --max-stays 256 --max-chunks 4 --project-root ./_smoke
+PYTHONPATH=. python3 -m mimic_iv_project.data_pipeline --build-all --max-stays 256 --max-chunks 4 --project-root ./_smoke
 ```
 
-Train baselines:
+Train the current baselines:
 
 ```bash
-PYTHONPATH=. python3 -m mimic_iv_project.train_baselines
+PYTHONPATH=. python3 -m mimic_iv_project.train_baselines --project-root ./_smoke
 ```
 
-Train the transformer:
+Train the current transformer:
 
 ```bash
-PYTHONPATH=. python3 -m mimic_iv_project.train_transformer --epochs 20 --batch-size 64
+PYTHONPATH=. python3 -m mimic_iv_project.train_transformer --project-root ./_smoke --epochs 5 --batch-size 32
 ```
 
-## Why This Might Be Effective
+## More Detail
 
-This setup is useful because it compares:
-
-- strong simple baselines
-- a sequence model that handles irregular timing better
-
-That gives a cleaner research story:
-
-- Are simple summary features already enough?
-- Does a sequence model help?
-- Does patient-specific decay help more than a plain transformer?
-
-## If You Are New To The Repo
-
-The best order is:
-
-1. run the smoke build
-2. inspect `artifacts/`
-3. train the baselines
-4. train the transformer
-5. run the full-data build after that
+See [PROJECT_BRIEF.md](PROJECT_BRIEF.md) for the project aim, label definition, available MIMIC-IV tables, and next implementation steps.
