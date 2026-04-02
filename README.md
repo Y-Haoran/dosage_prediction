@@ -13,6 +13,15 @@ The intended model output is:
 - `continue broad-spectrum likely justified`
 - `high-priority candidate for de-escalation review`
 
+## Related EDA Reports
+
+This repo now also includes exploratory analyses for adjacent MIMIC-IV clinical prediction questions:
+
+- [EDA_BLOOD_CULTURE_LABEL_VALIDITY.md](EDA_BLOOD_CULTURE_LABEL_VALIDITY.md)
+  - asks whether a first Gram-positive positive blood-culture alert is more likely true bloodstream infection or contamination
+- [EDA_ANTIBIOTIC_PROJECT.md](EDA_ANTIBIOTIC_PROJECT.md)
+  - sizes the original 48-hour antibiotic-review cohort
+
 ## Why This Question?
 
 This is a cleaner stewardship question than asking whether the very first empiric choice was correct.
