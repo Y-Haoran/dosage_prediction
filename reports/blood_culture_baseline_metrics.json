@@ -1,0 +1,157 @@
+{
+  "cohort": {
+    "rows": 3251,
+    "train_rows": 2269,
+    "val_rows": 490,
+    "test_rows": 492,
+    "train_positive": 759,
+    "val_positive": 147,
+    "test_positive": 160
+  },
+  "models": {
+    "full_features": {
+      "logistic_regression": {
+        "validation": {
+          "threshold": 0.21999999999999997,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "accuracy": 1.0,
+          "auroc": 0.9999999999999999,
+          "auprc": 1.0,
+          "brier": 0.0005999772301903784,
+          "tp": 147,
+          "tn": 343,
+          "fp": 0,
+          "fn": 0,
+          "positives": 147,
+          "negatives": 343,
+          "best_f1_scan": 1.0
+        },
+        "test": {
+          "threshold": 0.21999999999999997,
+          "f1": 0.9907120743034056,
+          "precision": 0.9815950920245399,
+          "recall": 1.0,
+          "accuracy": 0.9939024390243902,
+          "auroc": 0.9999435240963855,
+          "auprc": 0.9998846142922063,
+          "brier": 0.0030408484538194083,
+          "tp": 160,
+          "tn": 329,
+          "fp": 3,
+          "fn": 0,
+          "positives": 160,
+          "negatives": 332
+        }
+      },
+      "xgboost": {
+        "validation": {
+          "threshold": 0.6799999999999999,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "accuracy": 1.0,
+          "auroc": 0.9999999999999999,
+          "auprc": 1.0,
+          "brier": 0.001536750137173609,
+          "tp": 147,
+          "tn": 343,
+          "fp": 0,
+          "fn": 0,
+          "positives": 147,
+          "negatives": 343,
+          "best_f1_scan": 1.0
+        },
+        "test": {
+          "threshold": 0.6799999999999999,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "accuracy": 1.0,
+          "auroc": 1.0,
+          "auprc": 1.0,
+          "brier": 0.00048176867651280307,
+          "tp": 160,
+          "tn": 332,
+          "fp": 0,
+          "fn": 0,
+          "positives": 160,
+          "negatives": 332
+        }
+      }
+    },
+    "no_organism_features": {
+      "logistic_regression": {
+        "validation": {
+          "threshold": 0.5199999999999999,
+          "f1": 0.5911949685534591,
+          "precision": 0.5497076023391813,
+          "recall": 0.6394557823129252,
+          "accuracy": 0.7346938775510204,
+          "auroc": 0.7350905376727951,
+          "auprc": 0.5886130123172084,
+          "brier": 0.20323881876397468,
+          "tp": 94,
+          "tn": 266,
+          "fp": 77,
+          "fn": 53,
+          "positives": 147,
+          "negatives": 343,
+          "best_f1_scan": 0.5911949685534592
+        },
+        "test": {
+          "threshold": 0.5199999999999999,
+          "f1": 0.5454545454545454,
+          "precision": 0.5138121546961326,
+          "recall": 0.58125,
+          "accuracy": 0.6849593495934959,
+          "auroc": 0.7226468373493976,
+          "auprc": 0.5704345859895026,
+          "brier": 0.21021984920998746,
+          "tp": 93,
+          "tn": 244,
+          "fp": 88,
+          "fn": 67,
+          "positives": 160,
+          "negatives": 332
+        }
+      },
+      "xgboost": {
+        "validation": {
+          "threshold": 0.59,
+          "f1": 0.6601307189542484,
+          "precision": 0.6352201257861635,
+          "recall": 0.6870748299319728,
+          "accuracy": 0.7877551020408163,
+          "auroc": 0.8161083675452687,
+          "auprc": 0.6993962203727846,
+          "brier": 0.1703081856809377,
+          "tp": 101,
+          "tn": 285,
+          "fp": 58,
+          "fn": 46,
+          "positives": 147,
+          "negatives": 343,
+          "best_f1_scan": 0.6601307189542484
+        },
+        "test": {
+          "threshold": 0.59,
+          "f1": 0.6476190476190476,
+          "precision": 0.6580645161290323,
+          "recall": 0.6375,
+          "accuracy": 0.774390243902439,
+          "auroc": 0.8366716867469879,
+          "auprc": 0.736903704781815,
+          "brier": 0.16025230066663657,
+          "tp": 102,
+          "tn": 279,
+          "fp": 53,
+          "fn": 58,
+          "positives": 160,
+          "negatives": 332
+        }
+      }
+    }
+  }
+}

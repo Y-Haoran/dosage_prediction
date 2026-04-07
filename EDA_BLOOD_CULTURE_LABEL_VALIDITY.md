@@ -187,9 +187,13 @@ Current generated artifacts:
 - `artifacts/blood_culture/blood_culture_cohort_metadata.json`
 - `artifacts/blood_culture/blood_culture_label_metadata.json`
 
+The first baseline results using these cohort/label artifacts are summarized in [BASELINE_BLOOD_CULTURE_RESULTS.md](BASELINE_BLOOD_CULTURE_RESULTS.md).
+
 ## Files
 
 - Script: [scripts/blood_culture_label_validity_eda.py](scripts/blood_culture_label_validity_eda.py)
 - Cohort builder: [scripts/build_blood_culture_cohort.py](scripts/build_blood_culture_cohort.py)
 - Label builder: [scripts/build_blood_culture_labels.py](scripts/build_blood_culture_labels.py)
+- Feature builder: [scripts/build_blood_culture_features.py](scripts/build_blood_culture_features.py)
+- Baseline trainer: [scripts/train_blood_culture_baselines.py](scripts/train_blood_culture_baselines.py)
 - Summary JSON: [reports/blood_culture_label_validity_summary.json](reports/blood_culture_label_validity_summary.json)

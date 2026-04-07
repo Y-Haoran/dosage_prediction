@@ -1,0 +1,5 @@
+{
+  "train_subjects": 2152,
+  "val_subjects": 461,
+  "test_subjects": 462
+}
