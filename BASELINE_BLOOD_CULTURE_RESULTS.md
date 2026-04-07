@@ -40,7 +40,9 @@ This includes:
 - demographics
 - prior culture history
 - pre-alert labs
+- pre-alert ICU vital summaries
 - pre-alert antibiotics
+- pre-alert ICU support proxies
 - organism family features
 
 ### 2. No-organism features
@@ -49,14 +51,20 @@ This excludes organism-family indicators and is a more conservative test.
 
 That matters because the current provisional label is partly defined using organism type. So the no-organism setting is a better estimate of how much signal comes from the rest of the EHR rather than from the label heuristic itself.
 
+It still includes the newly added:
+
+- pre-alert ICU vital-sign summaries
+- vasopressor exposure features
+- mechanical-ventilation proxy features
+
 ## Test-set results
 
 ### Full features
 
 | Model | F1 | Precision | Recall | Accuracy | AUROC | AUPRC | Brier |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Logistic Regression | `0.991` | `0.982` | `1.000` | `0.994` | `0.9999` | `0.9999` | `0.0030` |
-| XGBoost | `1.000` | `1.000` | `1.000` | `1.000` | `1.0000` | `1.0000` | `0.0005` |
+| Logistic Regression | `0.991` | `0.982` | `1.000` | `0.994` | `1.0000` | `0.9999` | `0.0020` |
+| XGBoost | `1.000` | `1.000` | `1.000` | `1.000` | `1.0000` | `1.0000` | `0.0007` |
 
 Confusion counts:
 
@@ -71,19 +79,26 @@ These scores are almost certainly too optimistic for scientific interpretation, 
 
 | Model | F1 | Precision | Recall | Accuracy | AUROC | AUPRC | Brier |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Logistic Regression | `0.545` | `0.514` | `0.581` | `0.685` | `0.723` | `0.570` | `0.210` |
-| XGBoost | `0.648` | `0.658` | `0.638` | `0.774` | `0.837` | `0.737` | `0.160` |
+| Logistic Regression | `0.561` | `0.522` | `0.606` | `0.691` | `0.729` | `0.565` | `0.210` |
+| XGBoost | `0.672` | `0.601` | `0.762` | `0.758` | `0.834` | `0.729` | `0.161` |
 
 Confusion counts:
 
-- Logistic Regression: `TP=93`, `TN=244`, `FP=88`, `FN=67`
-- XGBoost: `TP=102`, `TN=279`, `FP=53`, `FN=58`
+- Logistic Regression: `TP=97`, `TN=243`, `FP=89`, `FN=63`
+- XGBoost: `TP=122`, `TN=251`, `FP=81`, `FN=38`
 
 Interpretation:
 
 This is the more useful first result.
 
-Even without organism-family features, there is still real predictive signal in the pre-alert EHR, and XGBoost clearly outperforms logistic regression on this first baseline.
+Even without organism-family features, there is still real predictive signal in the pre-alert EHR, and XGBoost still clearly outperforms logistic regression on this first baseline.
+
+Adding ICU vitals and support proxies improved F1 for the no-organism models:
+
+- Logistic Regression: `0.545 -> 0.561`
+- XGBoost: `0.648 -> 0.672`
+
+The gain is real but not dramatic, which makes sense because this is a hospital-wide cohort and only a minority of alerts have ICU charting available in the prior `24h`.
 
 ## Validation-threshold selection
 
@@ -91,10 +106,10 @@ The probability threshold was chosen on the validation split by maximizing valid
 
 Chosen thresholds:
 
-- Full-feature logistic regression: `0.22`
-- Full-feature XGBoost: `0.68`
-- No-organism logistic regression: `0.52`
-- No-organism XGBoost: `0.59`
+- Full-feature logistic regression: `0.25`
+- Full-feature XGBoost: `0.76`
+- No-organism logistic regression: `0.53`
+- No-organism XGBoost: `0.42`
 
 ## What these results mean
 
@@ -105,6 +120,7 @@ The safer conclusion is:
 - the provisional label set is learnable
 - some of the strongest signal comes from organism identity
 - but even after removing organism-family features, the task still has meaningful signal
+- ICU physiology adds incremental value, especially for recall in XGBoost
 - XGBoost is the stronger first baseline
 
 ## Important caution

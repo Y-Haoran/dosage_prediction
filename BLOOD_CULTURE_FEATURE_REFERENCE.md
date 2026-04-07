@@ -33,7 +33,7 @@ Only the high-confidence binary subset is used for the first baseline model.
 
 ## Feature groups
 
-The current tabular baseline uses `91` training features.
+The current tabular baseline uses `121` training features.
 
 ### 1. Alert context: 9 features
 
@@ -89,7 +89,25 @@ Labs used:
 - `sodium`
 - `potassium`
 
-### 5. Pre-alert antibiotic exposure in the 24h lookback: 11 features
+### 5. ICU vital-sign summaries from the 24h lookback: 25 features
+
+For each vital, the feature set includes:
+
+- `last`
+- `min`
+- `max`
+- `mean`
+- `count`
+
+Vitals used:
+
+- `heart_rate`
+- `resp_rate`
+- `temperature_c`
+- `map`
+- `spo2`
+
+### 6. Pre-alert antibiotic exposure in the 24h lookback: 11 features
 
 - `abx_total_admin_24h`
 - `abx_total_admin_24h_flag`
@@ -103,12 +121,33 @@ Labs used:
 - `abx_broad_gram_negative_24h_flag`
 - `abx_anti_mrsa_24h_flag`
 
-### 6. One-hot encoded demographics and admission context: 20 features
+### 7. ICU organ-support proxies from the 24h lookback: 5 features
+
+- `vasopressor_event_count_24h`
+- `vasopressor_active_24h`
+- `vasopressor_on_at_alert`
+- `mechanical_ventilation_chart_events_24h`
+- `mechanical_ventilation_24h`
+
+### 8. One-hot encoded demographics and admission context: 20 features
 
 - sex indicators
 - admission type indicators
 - insurance group indicators
 - race group indicators
+
+## Coverage note
+
+This cohort is hospital-wide, not ICU-only.
+
+That means the ICU-derived feature groups above are informative but sparse:
+
+- only about `13%` of high-confidence alerts have ICU vital-sign charting in the prior `24h`
+- `6.64%` have vasopressor exposure in the prior `24h`
+- `4.28%` are still on vasopressors at the alert time
+- `6.58%` have the mechanical-ventilation proxy in the prior `24h`
+
+So these features matter most for the ICU subset, while the broader hospital-wide model still relies heavily on labs, microbiology history, and antibiotic context.
 
 ## Important distinction
 
