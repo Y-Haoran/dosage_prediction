@@ -779,9 +779,13 @@ def main() -> None:
     features = _build_mechanical_ventilation_features(features, config, lookback_hours=args.lookback_hours)
 
     features["target_true_bsi"] = np.where(
-        features["provisional_label"] == "likely_true_bsi",
+        features["provisional_label"] == "probable_clinically_significant_bsi_alert",
         1,
-        np.where(features["provisional_label"] == "likely_contaminant", 0, np.nan),
+        np.where(
+            features["provisional_label"] == "probable_contaminant_or_low_significance_alert",
+            0,
+            np.nan,
+        ),
     )
 
     categorical_cols = ["gender", "admission_type", "insurance_group", "race_group"]
