@@ -122,11 +122,12 @@ The current baseline results file is:
 
 - [BASELINE_BLOOD_CULTURE_RESULTS.md](BASELINE_BLOOD_CULTURE_RESULTS.md)
 
-Important:
+Current main result from the stricter no-organism model:
 
-- that file currently describes the **older label version**
-- it should be treated as historical / outdated
-- the baselines need to be rerun on the new label set
+- held-out test AUROC: about `0.94`
+- held-out test F1: about `0.86`
+
+That means the model still performs well even when we do **not** give it organism-family identity.
 
 ## Other Helpful Files
 
@@ -145,6 +146,6 @@ Important:
 
 The next correct step is:
 
-1. rebuild the feature table using the new labels
-2. rerun Logistic Regression and XGBoost
-3. update the baseline results file with the new label set
+1. do subgroup error analysis
+2. test calibration carefully
+3. review a sample of predictions with clinicians

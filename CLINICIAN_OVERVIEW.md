@@ -88,6 +88,26 @@ Current first Gram-positive alert dataset:
 - probable contaminant / low significance: `1,260`
 - indeterminate: `3,040`
 
+For the first model run, we trained only on the clearer binary subset:
+
+- high-confidence binary alerts: `2,506`
+
+## Current Baseline Performance
+
+The most important result is the stricter model that does **not** use organism-family identity.
+
+On the held-out test set:
+
+- Logistic Regression: AUROC `0.94`, F1 `0.87`
+- XGBoost: AUROC `0.94`, F1 `0.86`
+
+Plain meaning:
+
+- the model can separate many likely real alerts from likely low-significance alerts
+- and it can do this even before formal species identification is used
+
+This is encouraging, but it is still a research result, not a clinical deployment result.
+
 ## Important Limitation
 
 These labels are still research labels.

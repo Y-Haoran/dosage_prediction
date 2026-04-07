@@ -1,152 +1,129 @@
-# Baseline Results For Gram-Positive Blood-Culture Labels
+# Baseline Results For Blood-Culture Alert Classification
 
-## Important Note
+## What Was Trained
 
-This file is now **out of date**.
-
-Reason:
-
-- these results were produced with the **older label version**
-- the repo now uses a newer clinical-significance label:
-  - `probable_clinically_significant_bsi_alert`
-  - `probable_contaminant_or_low_significance_alert`
-
-So please read this file as a historical baseline only.
-
-The models need to be rerun on the new label set.
-
-## What was trained
-
-Two baseline models were trained on the high-confidence binary subset:
+Two baseline models were trained on the current clinically meaningful label set:
 
 - Logistic Regression
 - XGBoost
 
 Target:
 
-- `0` = `likely_contaminant`
-- `1` = `likely_true_bsi`
+- `0` = `probable_contaminant_or_low_significance_alert`
+- `1` = `probable_clinically_significant_bsi_alert`
 
 The `indeterminate` group was excluded from training and evaluation.
 
-## Cohort used for baseline training
+## Cohort Used For Baseline Training
 
-- Total high-confidence binary rows: `3,251`
-- Train rows: `2,269`
-- Validation rows: `490`
-- Test rows: `492`
-- Train positives: `759`
-- Validation positives: `147`
-- Test positives: `160`
+- total high-confidence binary rows: `2,506`
+- train rows: `1,755`
+- validation rows: `379`
+- test rows: `372`
+- train positives: `859`
+- validation positives: `196`
+- test positives: `191`
 
 Subject-level split:
 
-- Train subjects: `2,152`
-- Validation subjects: `461`
-- Test subjects: `462`
+- train subjects: `1,658`
+- validation subjects: `355`
+- test subjects: `356`
 
-## Two feature settings were evaluated
+## Two Feature Settings Were Evaluated
 
 ### 1. Full features
 
 This includes:
 
-- alert context
-- demographics
+- demographics and alert context
 - prior culture history
 - pre-alert labs
 - pre-alert ICU vital summaries
 - pre-alert antibiotics
 - pre-alert ICU support proxies
-- organism family features
+- organism-family indicators
 
 ### 2. No-organism features
 
-This excludes organism-family indicators and is a more conservative test.
+This is the stricter experiment.
 
-That matters because the current provisional label is partly defined using organism type. So the no-organism setting is a better estimate of how much signal comes from the rest of the EHR rather than from the label heuristic itself.
+It removes organism-family indicators and keeps only the pre-alert clinical context and physiology.
 
-It still includes the newly added:
+This is the main result if we want the model to work before formal organism identification is available.
 
-- pre-alert ICU vital-sign summaries
-- vasopressor exposure features
-- mechanical-ventilation proxy features
-
-## Test-set results
+## Test-Set Results
 
 ### Full features
 
 | Model | F1 | Precision | Recall | Accuracy | AUROC | AUPRC | Brier |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Logistic Regression | `0.991` | `0.982` | `1.000` | `0.994` | `1.0000` | `0.9999` | `0.0020` |
-| XGBoost | `1.000` | `1.000` | `1.000` | `1.000` | `1.0000` | `1.0000` | `0.0007` |
+| Logistic Regression | `0.968` | `0.979` | `0.958` | `0.968` | `0.990` | `0.991` | `0.029` |
+| XGBoost | `0.982` | `0.984` | `0.979` | `0.981` | `0.998` | `0.998` | `0.021` |
 
 Confusion counts:
 
-- Logistic Regression: `TP=160`, `TN=329`, `FP=3`, `FN=0`
-- XGBoost: `TP=160`, `TN=332`, `FP=0`, `FN=0`
+- Logistic Regression: `TP=183`, `TN=177`, `FP=4`, `FN=8`
+- XGBoost: `TP=187`, `TN=178`, `FP=3`, `FN=4`
 
 Interpretation:
 
-These scores are almost certainly too optimistic for scientific interpretation, because organism-family features overlap strongly with how the current provisional labels were defined.
+These are upper-bound results. They are useful, but not the cleanest scientific result because organism-family indicators are powerful and may not be available at the earliest alert time.
 
 ### No-organism features
 
 | Model | F1 | Precision | Recall | Accuracy | AUROC | AUPRC | Brier |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Logistic Regression | `0.561` | `0.522` | `0.606` | `0.691` | `0.729` | `0.565` | `0.210` |
-| XGBoost | `0.672` | `0.601` | `0.762` | `0.758` | `0.834` | `0.729` | `0.161` |
+| Logistic Regression | `0.868` | `0.873` | `0.864` | `0.866` | `0.940` | `0.943` | `0.101` |
+| XGBoost | `0.864` | `0.880` | `0.848` | `0.863` | `0.944` | `0.949` | `0.093` |
 
 Confusion counts:
 
-- Logistic Regression: `TP=97`, `TN=243`, `FP=89`, `FN=63`
-- XGBoost: `TP=122`, `TN=251`, `FP=81`, `FN=38`
+- Logistic Regression: `TP=165`, `TN=157`, `FP=24`, `FN=26`
+- XGBoost: `TP=162`, `TN=159`, `FP=22`, `FN=29`
 
 Interpretation:
 
-This is the more useful first result.
+This is the main result.
 
-Even without organism-family features, there is still real predictive signal in the pre-alert EHR, and XGBoost still clearly outperforms logistic regression on this first baseline.
+Even without organism-family identity, the model still performs strongly on the held-out test set. That supports the idea that the pre-alert EHR contains meaningful clinical signal about whether the alert is likely clinically significant.
 
-Adding ICU vitals and support proxies improved F1 for the no-organism models:
-
-- Logistic Regression: `0.545 -> 0.561`
-- XGBoost: `0.648 -> 0.672`
-
-The gain is real but not dramatic, which makes sense because this is a hospital-wide cohort and only a minority of alerts have ICU charting available in the prior `24h`.
-
-## Validation-threshold selection
+## Validation Thresholds
 
 The probability threshold was chosen on the validation split by maximizing validation F1, then applied unchanged to the test split.
 
 Chosen thresholds:
 
-- Full-feature logistic regression: `0.25`
-- Full-feature XGBoost: `0.76`
-- No-organism logistic regression: `0.53`
-- No-organism XGBoost: `0.42`
+- full-feature logistic regression: `0.26`
+- full-feature XGBoost: `0.31`
+- no-organism logistic regression: `0.41`
+- no-organism XGBoost: `0.47`
 
-## What these results mean
+## What These Results Mean
 
-The main conclusion is not that the task is solved.
+The safest summary is:
 
-The safer conclusion is:
+- the new clinical-significance label is learnable
+- organism identity helps, as expected
+- but strong performance remains even after removing organism-family features
+- simple baselines already perform well on this task
 
-- the provisional label set is learnable
-- some of the strongest signal comes from organism identity
-- but even after removing organism-family features, the task still has meaningful signal
-- ICU physiology adds incremental value, especially for recall in XGBoost
-- XGBoost is the stronger first baseline
+One interesting detail:
 
-## Important caution
+- XGBoost has slightly better AUROC, AUPRC, and Brier score
+- Logistic Regression has slightly better test F1 in the no-organism setting
 
-These are baseline results against a provisional label, not a clinician-validated gold standard.
+So there is not a single winner for every metric.
 
-So these numbers should be read as:
+## Important Caution
 
-- a pipeline feasibility result
+These are still baseline results against a research label, not a gold-standard manual review label.
+
+So they should be read as:
+
+- a strong feasibility result
 - an early benchmark
-- not a final clinical-performance claim
+- not a final clinical deployment claim
 
 ## Files
 
