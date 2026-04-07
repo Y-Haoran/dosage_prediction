@@ -21,6 +21,8 @@ This repo now also includes exploratory analyses for adjacent MIMIC-IV clinical 
   - asks whether a first Gram-positive positive blood-culture alert is more likely true bloodstream infection or contamination
 - [BASELINE_BLOOD_CULTURE_RESULTS.md](BASELINE_BLOOD_CULTURE_RESULTS.md)
   - reports Logistic Regression and XGBoost baseline results for the high-confidence blood-culture subset
+- [BLOOD_CULTURE_FEATURE_REFERENCE.md](BLOOD_CULTURE_FEATURE_REFERENCE.md)
+  - lists the training features and links to a synthetic example dataset with a few hundred rows
 - [EDA_ANTIBIOTIC_PROJECT.md](EDA_ANTIBIOTIC_PROJECT.md)
   - sizes the original 48-hour antibiotic-review cohort
 
