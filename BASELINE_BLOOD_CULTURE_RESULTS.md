@@ -53,6 +53,7 @@ Full list:
 Raw metrics JSON:
 
 - [reports/blood_culture_primary_feature_metrics.json](reports/blood_culture_primary_feature_metrics.json)
+- [PRIMARY_BASELINE_EXPLAINABILITY.md](PRIMARY_BASELINE_EXPLAINABILITY.md)
 
 ## Held-Out Test Results
 

@@ -63,8 +63,21 @@ Plain meaning:
 - the model shows useful signal
 - but this is still a research result, not a deployment-ready tool
 
+## What Looks Most Important
+
+In the current baseline, the strongest signals are mostly:
+
+- platelet features
+- creatinine features
+- age
+- ICU status
+- temperature features
+
+So the model appears to be using general illness severity and host-response pattern, not only one single measurement.
+
 ## Best Files To Open
 
 - main results: [BASELINE_BLOOD_CULTURE_RESULTS.md](BASELINE_BLOOD_CULTURE_RESULTS.md)
 - feature list: [BLOOD_CULTURE_FEATURE_REFERENCE.md](BLOOD_CULTURE_FEATURE_REFERENCE.md)
+- explainability summary: [PRIMARY_BASELINE_EXPLAINABILITY.md](PRIMARY_BASELINE_EXPLAINABILITY.md)
 - alert-level dataset: `artifacts/blood_culture/first_gp_alert_dataset.csv`

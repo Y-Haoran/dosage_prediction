@@ -55,6 +55,7 @@ Main files:
 - clinician summary: [CLINICIAN_OVERVIEW.md](CLINICIAN_OVERVIEW.md)
 - baseline results: [BASELINE_BLOOD_CULTURE_RESULTS.md](BASELINE_BLOOD_CULTURE_RESULTS.md)
 - feature reference: [BLOOD_CULTURE_FEATURE_REFERENCE.md](BLOOD_CULTURE_FEATURE_REFERENCE.md)
+- explainability summary: [PRIMARY_BASELINE_EXPLAINABILITY.md](PRIMARY_BASELINE_EXPLAINABILITY.md)
 - clean baseline metrics JSON: [reports/blood_culture_primary_feature_metrics.json](reports/blood_culture_primary_feature_metrics.json)
 
 ## Main Result
@@ -65,6 +66,11 @@ Held-out test performance for the clean 41-feature baseline:
 - XGBoost: AUROC `0.809`, F1 `0.761`
 
 This is the main result that should be read first.
+
+Dataset highlights:
+
+- unique patients in the full first-alert dataset: `5,021`
+- unique patients in the high-confidence binary subset: `2,369`
 
 ## Data Pipeline Files
 
@@ -86,6 +92,7 @@ Main scripts:
 These are still useful, but they are not the main story of the repo:
 
 - [EDA_BLOOD_CULTURE_LABEL_VALIDITY.md](EDA_BLOOD_CULTURE_LABEL_VALIDITY.md)
+- [PRIMARY_BASELINE_EXPLAINABILITY.md](PRIMARY_BASELINE_EXPLAINABILITY.md)
 - `artifacts/blood_culture/blood_culture_specimen_subset.csv`
 - `artifacts/blood_culture/blood_culture_specimen_subset_preview.csv`
 
