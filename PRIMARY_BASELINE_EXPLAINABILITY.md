@@ -121,6 +121,15 @@ Figure:
 
 ## Correlation Findings
 
+Important note:
+
+- the correlation figure now excludes two constant-zero features:
+  - `prior_gp_positive_specimens_24h`
+  - `prior_gp_positive_specimens_7d`
+- those two columns were producing `NaN` rows and columns in the old heatmap, which is why the previous picture looked broken
+- the current heatmap shows the remaining `39` non-constant features only
+- several lab and ICU vital features are still sparse in this hospital-wide cohort, so the correlation plot should be read as a redundancy check, not as a causal map
+
 The strongest correlations are not surprising. They mainly show feature redundancy inside the compact set.
 
 Examples:
@@ -141,6 +150,7 @@ Files:
 
 - [reports/blood_culture_primary_feature_correlation_pairs.csv](reports/blood_culture_primary_feature_correlation_pairs.csv)
 - [reports/blood_culture_primary_feature_correlation_matrix.csv](reports/blood_culture_primary_feature_correlation_matrix.csv)
+- [reports/blood_culture_primary_feature_observation_rates.csv](reports/blood_culture_primary_feature_observation_rates.csv)
 - [reports/blood_culture_primary_feature_correlation.png](reports/blood_culture_primary_feature_correlation.png)
 
 Figure:

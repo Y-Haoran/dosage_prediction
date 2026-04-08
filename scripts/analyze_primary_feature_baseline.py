@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -160,13 +161,19 @@ def _save_barplot(
 
 
 def _save_heatmap(corr: pd.DataFrame, path: Path) -> None:
+    values = corr.to_numpy()
+    mask = np.triu(np.ones_like(values, dtype=bool), k=1)
+    masked_values = np.ma.array(values, mask=mask)
+    cmap = plt.get_cmap("coolwarm").copy()
+    cmap.set_bad(color="white")
+
     fig, ax = plt.subplots(figsize=(12, 10))
-    im = ax.imshow(corr.to_numpy(), cmap="coolwarm", vmin=-1, vmax=1)
+    im = ax.imshow(masked_values, cmap=cmap, vmin=-1, vmax=1)
     ax.set_xticks(np.arange(len(corr.columns)))
     ax.set_yticks(np.arange(len(corr.index)))
     ax.set_xticklabels(corr.columns, rotation=90, fontsize=7)
     ax.set_yticklabels(corr.index, fontsize=7)
-    ax.set_title("Primary Feature Correlation Matrix")
+    ax.set_title("Primary Feature Correlation Matrix (Non-constant Features)")
     fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     fig.tight_layout()
     fig.savefig(path, dpi=180)
@@ -177,7 +184,9 @@ def main() -> None:
     project_root = Path.cwd()
     features_path = project_root / "artifacts" / "blood_culture" / "first_gp_alert_features.csv"
     reports_dir = project_root / "reports"
+    figures_dir = project_root / "figures" / "primary_baseline"
     reports_dir.mkdir(parents=True, exist_ok=True)
+    figures_dir.mkdir(parents=True, exist_ok=True)
 
     df = pd.read_csv(features_path)
     data = df[df["is_high_confidence_binary"] == 1].copy()
@@ -266,10 +275,23 @@ def main() -> None:
         }
     ).sort_values("mean_abs_shap", ascending=False).reset_index(drop=True)
 
-    corr = data[PRIMARY_FEATURES].corr()
+    feature_frame = data[PRIMARY_FEATURES].copy()
+    feature_stats = pd.DataFrame(
+        {
+            "feature": PRIMARY_FEATURES,
+            "non_missing_count": [int(feature_frame[col].notna().sum()) for col in PRIMARY_FEATURES],
+            "observation_rate": [float(feature_frame[col].notna().mean()) for col in PRIMARY_FEATURES],
+            "unique_non_missing": [int(feature_frame[col].nunique(dropna=True)) for col in PRIMARY_FEATURES],
+            "variance": [float(feature_frame[col].var(skipna=True)) for col in PRIMARY_FEATURES],
+        }
+    )
+    nonconstant_features = feature_stats.loc[feature_stats["unique_non_missing"] > 1, "feature"].tolist()
+    dropped_constant_features = feature_stats.loc[feature_stats["unique_non_missing"] <= 1, "feature"].tolist()
+
+    corr = feature_frame[nonconstant_features].corr()
     corr_pairs = []
-    for i, left in enumerate(PRIMARY_FEATURES):
-        for right in PRIMARY_FEATURES[i + 1 :]:
+    for i, left in enumerate(nonconstant_features):
+        for right in nonconstant_features[i + 1 :]:
             value = corr.loc[left, right]
             if pd.isna(value):
                 continue
@@ -285,6 +307,10 @@ def main() -> None:
 
     logistic_coefs.to_csv(reports_dir / "blood_culture_primary_logistic_coefficients.csv", index=False)
     shap_importance.to_csv(reports_dir / "blood_culture_primary_xgb_shap_importance.csv", index=False)
+    feature_stats.sort_values(["observation_rate", "feature"]).to_csv(
+        reports_dir / "blood_culture_primary_feature_observation_rates.csv",
+        index=False,
+    )
     corr.to_csv(reports_dir / "blood_culture_primary_feature_correlation_matrix.csv", index=True)
     corr_pairs_df.to_csv(reports_dir / "blood_culture_primary_feature_correlation_pairs.csv", index=False)
 
@@ -305,10 +331,23 @@ def main() -> None:
         color="#1d3557",
     )
     _save_heatmap(corr, reports_dir / "blood_culture_primary_feature_correlation.png")
+    shutil.copy2(reports_dir / "blood_culture_primary_xgb_shap_importance.png", figures_dir / "xgb_shap_importance.png")
+    shutil.copy2(
+        reports_dir / "blood_culture_primary_logistic_coefficients.png",
+        figures_dir / "logistic_coefficients.png",
+    )
+    shutil.copy2(
+        reports_dir / "blood_culture_primary_feature_correlation.png",
+        figures_dir / "feature_correlation.png",
+    )
 
     summary = {
         "feature_set_name": "PRIMARY_FEATURES",
         "feature_count": len(PRIMARY_FEATURES),
+        "correlation_plot": {
+            "features_shown": len(nonconstant_features),
+            "dropped_constant_features": dropped_constant_features,
+        },
         "cohort": {
             "rows": int(len(data)),
             "unique_patients": int(data["subject_id"].nunique()),
@@ -340,6 +379,7 @@ def main() -> None:
         "files": {
             "logistic_coefficients_csv": str(reports_dir / "blood_culture_primary_logistic_coefficients.csv"),
             "xgb_shap_importance_csv": str(reports_dir / "blood_culture_primary_xgb_shap_importance.csv"),
+            "feature_observation_rates_csv": str(reports_dir / "blood_culture_primary_feature_observation_rates.csv"),
             "correlation_matrix_csv": str(reports_dir / "blood_culture_primary_feature_correlation_matrix.csv"),
             "correlation_pairs_csv": str(reports_dir / "blood_culture_primary_feature_correlation_pairs.csv"),
             "logistic_coefficients_png": str(reports_dir / "blood_culture_primary_logistic_coefficients.png"),

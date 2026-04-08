@@ -1,6 +1,13 @@
 {
   "feature_set_name": "PRIMARY_FEATURES",
   "feature_count": 41,
+  "correlation_plot": {
+    "features_shown": 39,
+    "dropped_constant_features": [
+      "prior_gp_positive_specimens_24h",
+      "prior_gp_positive_specimens_7d"
+    ]
+  },
   "cohort": {
     "rows": 2506,
     "unique_patients": 2369,
@@ -277,6 +284,7 @@
   "files": {
     "logistic_coefficients_csv": "/nfs/users/nfs_d/ds39/dosage_prediction/reports/blood_culture_primary_logistic_coefficients.csv",
     "xgb_shap_importance_csv": "/nfs/users/nfs_d/ds39/dosage_prediction/reports/blood_culture_primary_xgb_shap_importance.csv",
+    "feature_observation_rates_csv": "/nfs/users/nfs_d/ds39/dosage_prediction/reports/blood_culture_primary_feature_observation_rates.csv",
     "correlation_matrix_csv": "/nfs/users/nfs_d/ds39/dosage_prediction/reports/blood_culture_primary_feature_correlation_matrix.csv",
     "correlation_pairs_csv": "/nfs/users/nfs_d/ds39/dosage_prediction/reports/blood_culture_primary_feature_correlation_pairs.csv",
     "logistic_coefficients_png": "/nfs/users/nfs_d/ds39/dosage_prediction/reports/blood_culture_primary_logistic_coefficients.png",
