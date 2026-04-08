@@ -1,133 +1,86 @@
-# Baseline Results For Blood-Culture Alert Classification
+# Baseline Results For The First-Alert Model
 
-## What Was Trained
+## Main Baseline
 
-Two baseline models were trained on the current clinically meaningful label set:
+The main baseline in this repo is the **41-feature first-alert model**.
 
-- Logistic Regression
-- XGBoost
-
-Target:
+It predicts:
 
 - `0` = `probable_contaminant_or_low_significance_alert`
 - `1` = `probable_clinically_significant_bsi_alert`
 
-The `indeterminate` group was excluded from training and evaluation.
+using only pre-alert clinical information.
 
-## Cohort Used For Baseline Training
+## Cohort
 
-- total high-confidence binary rows: `2,506`
-- train rows: `1,755`
-- validation rows: `379`
-- test rows: `372`
-- train positives: `859`
-- validation positives: `196`
-- test positives: `191`
+- total first-alert rows: `5,546`
+- high-confidence binary rows used for training: `2,506`
 
-Subject-level split:
+Split used for the 41-feature baseline:
+
+- train rows: `1,764`
+- validation rows: `374`
+- test rows: `368`
+
+Subject-level counts:
 
 - train subjects: `1,658`
 - validation subjects: `355`
 - test subjects: `356`
 
-## Two Feature Settings Were Evaluated
+## Feature Set
 
-### 1. Full features
+The clean baseline uses `41` features:
 
-This includes:
+- age
+- ICU status
+- vasopressor and ventilation proxies
+- prior microbiology counts
+- WBC
+- platelets
+- creatinine
+- lactate
+- heart rate
+- respiratory rate
+- temperature
+- MAP
+- SpO2
 
-- demographics and alert context
-- prior culture history
-- pre-alert labs
-- pre-alert ICU vital summaries
-- pre-alert antibiotics
-- pre-alert ICU support proxies
-- organism-family indicators
+Full list:
 
-### 2. No-organism features
+- [BLOOD_CULTURE_FEATURE_REFERENCE.md](BLOOD_CULTURE_FEATURE_REFERENCE.md)
 
-This is the stricter experiment.
+Raw metrics JSON:
 
-It removes organism-family indicators and keeps only the pre-alert clinical context and physiology.
+- [reports/blood_culture_primary_feature_metrics.json](reports/blood_culture_primary_feature_metrics.json)
 
-This is the main result if we want the model to work before formal organism identification is available.
-
-## Test-Set Results
-
-### Full features
-
-| Model | F1 | Precision | Recall | Accuracy | AUROC | AUPRC | Brier |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Logistic Regression | `0.968` | `0.979` | `0.958` | `0.968` | `0.990` | `0.991` | `0.029` |
-| XGBoost | `0.982` | `0.984` | `0.979` | `0.981` | `0.998` | `0.998` | `0.021` |
-
-Confusion counts:
-
-- Logistic Regression: `TP=183`, `TN=177`, `FP=4`, `FN=8`
-- XGBoost: `TP=187`, `TN=178`, `FP=3`, `FN=4`
-
-Interpretation:
-
-These are upper-bound results. They are useful, but not the cleanest scientific result because organism-family indicators are powerful and may not be available at the earliest alert time.
-
-### No-organism features
+## Held-Out Test Results
 
 | Model | F1 | Precision | Recall | Accuracy | AUROC | AUPRC | Brier |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Logistic Regression | `0.868` | `0.873` | `0.864` | `0.866` | `0.940` | `0.943` | `0.101` |
-| XGBoost | `0.864` | `0.880` | `0.848` | `0.863` | `0.944` | `0.949` | `0.093` |
+| Logistic Regression | `0.767` | `0.638` | `0.961` | `0.717` | `0.798` | `0.728` | `0.182` |
+| XGBoost | `0.761` | `0.653` | `0.910` | `0.723` | `0.809` | `0.765` | `0.178` |
 
 Confusion counts:
 
-- Logistic Regression: `TP=165`, `TN=157`, `FP=24`, `FN=26`
-- XGBoost: `TP=162`, `TN=159`, `FP=22`, `FN=29`
+- Logistic Regression: `TP=171`, `TN=93`, `FP=97`, `FN=7`
+- XGBoost: `TP=162`, `TN=104`, `FP=86`, `FN=16`
 
-Interpretation:
+## Interpretation
 
-This is the main result.
+This is the clean result to focus on.
 
-Even without organism-family identity, the model still performs strongly on the held-out test set. That supports the idea that the pre-alert EHR contains meaningful clinical signal about whether the alert is likely clinically significant.
+It is weaker than the larger exploratory model, but it is easier to defend because:
 
-## Validation Thresholds
+- it avoids organism-family shortcuts
+- it avoids post-alert information
+- it matches the first-alert clinical question directly
 
-The probability threshold was chosen on the validation split by maximizing validation F1, then applied unchanged to the test split.
+The tradeoff is clear:
 
-Chosen thresholds:
+- Logistic Regression gives slightly better F1 and recall
+- XGBoost gives slightly better AUROC, AUPRC, accuracy, and Brier score
 
-- full-feature logistic regression: `0.26`
-- full-feature XGBoost: `0.31`
-- no-organism logistic regression: `0.41`
-- no-organism XGBoost: `0.47`
+## Secondary Results
 
-## What These Results Mean
-
-The safest summary is:
-
-- the new clinical-significance label is learnable
-- organism identity helps, as expected
-- but strong performance remains even after removing organism-family features
-- simple baselines already perform well on this task
-
-One interesting detail:
-
-- XGBoost has slightly better AUROC, AUPRC, and Brier score
-- Logistic Regression has slightly better test F1 in the no-organism setting
-
-So there is not a single winner for every metric.
-
-## Important Caution
-
-These are still baseline results against a research label, not a gold-standard manual review label.
-
-So they should be read as:
-
-- a strong feasibility result
-- an early benchmark
-- not a final clinical deployment claim
-
-## Files
-
-- Metrics JSON: [reports/blood_culture_baseline_metrics.json](reports/blood_culture_baseline_metrics.json)
-- Split counts: [reports/blood_culture_baseline_split_counts.json](reports/blood_culture_baseline_split_counts.json)
-- Feature builder: [scripts/build_blood_culture_features.py](scripts/build_blood_culture_features.py)
-- Trainer: [scripts/train_blood_culture_baselines.py](scripts/train_blood_culture_baselines.py)
+The repo also contains larger exploratory models with more features. Those are useful as secondary analyses, but they are not the main baseline story anymore.

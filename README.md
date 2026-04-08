@@ -1,151 +1,98 @@
-# Blood Culture Alert Project In MIMIC-IV
+# First-Alert Gram-Positive Blood-Culture Model
 
 ## Main Question
 
-When a first Gram-positive blood-culture alert appears, can we tell whether it is:
+At the time of the **first Gram-positive blood-culture alert** in a hospital admission, can we predict whether that alert is more likely:
 
-- a **clinically important bloodstream infection alert**
-- or a **likely contaminant / low-significance alert**
+- a **clinically significant bloodstream infection alert**
+- or a **contaminant / low-significance alert**
 
-This project is meant to help with early review and prioritization. It is not an automatic treatment tool.
-
-## Very Short Summary
-
-This repo now has three main pieces for the blood-culture project:
-
-1. a raw blood-culture subset from `microbiologyevents.csv`
-2. a grouped one-row-per-specimen table
-3. a first clinically meaningful label set for first Gram-positive alerts
-
-## Best Files To Open First
-
-If you want the simplest overview, start here:
-
-- [CLINICIAN_OVERVIEW.md](CLINICIAN_OVERVIEW.md)
-
-If you want to look at the actual local dataset files, these are the key ones:
-
-- raw blood-culture rows:
-  - `artifacts/blood_culture/blood_culture_rows.csv`
-- grouped specimen table:
-  - `artifacts/blood_culture/blood_culture_specimen_subset.csv`
-- small preview of the grouped table:
-  - `artifacts/blood_culture/blood_culture_specimen_subset_preview.csv`
-- first Gram-positive alert dataset with the current label:
-  - `artifacts/blood_culture/first_gp_alert_dataset.csv`
-- current label summary:
-  - `artifacts/blood_culture/blood_culture_label_metadata.json`
+This repo is centered on that one clean baseline task.
 
 ## What One Row Means
 
-There are two different dataset styles in this project.
+The main modeling dataset uses:
 
-### 1. Raw row-level microbiology table
+- one row = **one admission**
+- specifically, the **first Gram-positive alert** in that admission
 
-File:
+So this is **not** one row per bottle, one row per specimen, or one row per patient forever.
 
-- `artifacts/blood_culture/blood_culture_rows.csv`
+## Current Labels
 
-Meaning:
-
-- one row = one microbiology row from `microbiologyevents.csv`
-- this is close to the original MIMIC-IV table
-- one specimen can appear many times
-
-### 2. Grouped specimen-level table
-
-File:
-
-- `artifacts/blood_culture/blood_culture_specimen_subset.csv`
-
-Meaning:
-
-- one row = one `micro_specimen_id`
-- rows from the same specimen are grouped together
-- this is easier to use for modeling and review
-
-## Current Label
-
-The old simple label based only on organism type and repeat positivity has now been replaced in the first-alert dataset.
-
-The current label is:
+The current label set is:
 
 - `probable_clinically_significant_bsi_alert`
 - `probable_contaminant_or_low_significance_alert`
 - `indeterminate`
 
-Plain meaning:
+Only the first two groups are used for the first binary model.
 
-- `probable_clinically_significant_bsi_alert`
-  - more likely a real and clinically important infection signal
-- `probable_contaminant_or_low_significance_alert`
-  - more likely a contaminant or a low-significance alert
-- `indeterminate`
-  - not clear enough to trust for first-pass model training
+Current counts:
 
-## How The Current Label Is Built
-
-The current label uses:
-
-- organism pattern
-- repeat blood-culture evidence within `48h`
-- whether there were multiple blood-culture specimens in the episode
-- post-alert antibiotic continuation in the `24-72h` window
-
-It does **not** use pre-alert vitals or labs inside the label itself.
-
-That is important, because the model should learn from those inputs, not have them baked into the label.
-
-## Current Counts
-
-Current first Gram-positive alert dataset:
-
-- total rows: `5,546`
-- `probable_clinically_significant_bsi_alert`: `1,246`
-- `probable_contaminant_or_low_significance_alert`: `1,260`
-- `indeterminate`: `3,040`
+- total first-alert rows: `5,546`
+- clinically significant: `1,246`
+- contaminant / low significance: `1,260`
+- indeterminate: `3,040`
 - high-confidence binary subset: `2,506`
 
-## Important Caution
+## Main Baseline
 
-The blood-culture labels are still research labels.
+The main baseline in this repo is the **clean 41-feature first-alert model**.
 
-That means:
+It uses only:
 
-- they are clinically motivated
-- they are better than the older simple organism-only rule
-- but they are still **not** a gold-standard manual review label
+- age
+- care setting / ICU support
+- prior microbiology counts
+- pre-alert labs
+- pre-alert vitals
 
-## Model Results
+It does **not** use organism-family identity as a predictor.
 
-The current baseline results file is:
+Main files:
 
-- [BASELINE_BLOOD_CULTURE_RESULTS.md](BASELINE_BLOOD_CULTURE_RESULTS.md)
+- clinician summary: [CLINICIAN_OVERVIEW.md](CLINICIAN_OVERVIEW.md)
+- baseline results: [BASELINE_BLOOD_CULTURE_RESULTS.md](BASELINE_BLOOD_CULTURE_RESULTS.md)
+- feature reference: [BLOOD_CULTURE_FEATURE_REFERENCE.md](BLOOD_CULTURE_FEATURE_REFERENCE.md)
+- clean baseline metrics JSON: [reports/blood_culture_primary_feature_metrics.json](reports/blood_culture_primary_feature_metrics.json)
 
-Current main result from the stricter no-organism model:
+## Main Result
 
-- held-out test AUROC: about `0.94`
-- held-out test F1: about `0.86`
+Held-out test performance for the clean 41-feature baseline:
 
-That means the model still performs well even when we do **not** give it organism-family identity.
+- Logistic Regression: AUROC `0.798`, F1 `0.767`
+- XGBoost: AUROC `0.809`, F1 `0.761`
 
-## Other Helpful Files
+This is the main result that should be read first.
+
+## Data Pipeline Files
+
+Main local artifacts:
+
+- alert-level dataset: `artifacts/blood_culture/first_gp_alert_dataset.csv`
+- feature table used for training: `artifacts/blood_culture/first_gp_alert_features.csv`
+- label summary: `artifacts/blood_culture/blood_culture_label_metadata.json`
+
+Main scripts:
+
+- cohort builder: [scripts/build_blood_culture_cohort.py](scripts/build_blood_culture_cohort.py)
+- label builder: [scripts/build_blood_culture_labels.py](scripts/build_blood_culture_labels.py)
+- feature builder: [scripts/build_blood_culture_features.py](scripts/build_blood_culture_features.py)
+- baseline trainer: [scripts/train_blood_culture_baselines.py](scripts/train_blood_culture_baselines.py)
+
+## Supporting Files
+
+These are still useful, but they are not the main story of the repo:
 
 - [EDA_BLOOD_CULTURE_LABEL_VALIDITY.md](EDA_BLOOD_CULTURE_LABEL_VALIDITY.md)
-  - early blood-culture EDA and cohort sizing
-- [BLOOD_CULTURE_FEATURE_REFERENCE.md](BLOOD_CULTURE_FEATURE_REFERENCE.md)
-  - feature list for the earlier baseline feature table
-- [scripts/build_blood_culture_specimen_subset.py](scripts/build_blood_culture_specimen_subset.py)
-  - builds the grouped specimen-level subset
-- [scripts/build_blood_culture_labels.py](scripts/build_blood_culture_labels.py)
-  - builds the current clinical-significance labels
-- [scripts/build_blood_culture_features.py](scripts/build_blood_culture_features.py)
-  - builds the tabular model features
+- `artifacts/blood_culture/blood_culture_specimen_subset.csv`
+- `artifacts/blood_culture/blood_culture_specimen_subset_preview.csv`
 
-## Current Next Step
+## Practical Interpretation
 
-The next correct step is:
+The repo should now be read as:
 
-1. do subgroup error analysis
-2. test calibration carefully
-3. review a sample of predictions with clinicians
+- a **first-alert blood-culture classification project**
+- with a **clean 41-feature baseline**
+- and a larger exploratory pipeline behind it
