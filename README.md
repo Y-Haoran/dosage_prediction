@@ -75,7 +75,6 @@ Main files:
 - secondary `S. aureus` task: [secondary_tasks/s_aureus_first_alert/README.md](secondary_tasks/s_aureus_first_alert/README.md)
 - refined same-episode `S. aureus` report: [reports/s_aureus_same_episode_first_alert_report.md](reports/s_aureus_same_episode_first_alert_report.md)
 - enriched same-episode `S. aureus` report: [reports/s_aureus_same_episode_enriched_report.md](reports/s_aureus_same_episode_enriched_report.md)
-- secondary first-blood-culture `S. aureus` task: [secondary_tasks/s_aureus_first_blood_culture/README.md](secondary_tasks/s_aureus_first_blood_culture/README.md)
 - figures folder: [figures/primary_baseline](figures/primary_baseline)
 - clean baseline metrics JSON: [reports/blood_culture_primary_feature_metrics.json](reports/blood_culture_primary_feature_metrics.json)
 - pruned 18-feature metrics JSON: [reports/blood_culture_important_pruned_metrics.json](reports/blood_culture_important_pruned_metrics.json)
@@ -147,7 +146,5 @@ The repo should now be read as:
 
 Current secondary analysis:
 
-- early prioritization of later-confirmed `S. aureus` at the first Gram-positive alert
-- earlier `S. aureus` prioritization from the first blood-culture event using `0-24h` and `0-18h` windows
 - refined same-episode `S. aureus` prediction from the first Gram-positive alert, with single-organism and urgent/emergency cohort cleaning
 - enriched same-episode `S. aureus` model with process and prior-staphylococcal history features
