@@ -24,21 +24,9 @@
 - Logistic Regression: AUROC `0.666`, AUPRC `0.382`, F1 `0.459`
 - XGBoost: AUROC `0.640`, AUPRC `0.371`, F1 `0.465`
 
-## Sensitivity Cohort
-
-- same label and same pre-alert features
-- broader cohort: all single-organism first Gram-positive alerts
-
-- rows: `5,275`
-- unique patients: `4,802`
-- `S. aureus` positives: `1,397` (26.48%)
-
-- Logistic Regression: AUROC `0.594`, AUPRC `0.363`, F1 `0.465`
-- XGBoost: AUROC `0.631`, AUPRC `0.377`, F1 `0.490`
-
 ## Interpretation
 
 - this is scientifically cleaner than the broad first-blood-culture SAB dataset because the anchor and the final species outcome belong to the same microbiology episode
 - restricting to single-organism episodes removes some obvious label noise
-- the urgent / emergency subgroup improves AUROC compared with the looser all-single-organism cohort
+- the urgent / emergency subgroup gives the cleanest current same-episode baseline
 - performance is still modest, which suggests this task needs richer device, source, and prior staphylococcal context rather than more generic physiology alone

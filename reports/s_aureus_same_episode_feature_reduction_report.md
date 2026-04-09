@@ -104,6 +104,28 @@ Primary urgent / emergency same-episode cohort:
 
 So the smaller `19`-feature model preserved the enriched model’s performance and slightly improved the logistic model.
 
+## Model Family Comparison
+
+Using the same primary cohort and the same pruned `19` features:
+
+- Logistic Regression
+  - AUROC `0.812`, AUPRC `0.672`, F1 `0.615`
+
+- Elastic Net Logistic
+  - AUROC `0.812`, AUPRC `0.672`, F1 `0.617`
+
+- Random Forest
+  - AUROC `0.814`, AUPRC `0.713`, F1 `0.619`
+
+- XGBoost
+  - AUROC `0.820`, AUPRC `0.707`, F1 `0.604`
+
+This means the current signal is robust across model families:
+
+- `XGBoost` is still the strongest pure ranking model by AUROC
+- `Random Forest` gives the strongest AUPRC and F1 in this comparison
+- `Elastic Net` keeps a sparse linear model with nearly identical performance to standard logistic regression
+
 ## Recommended Current Model
 
 The most practical current model is:
@@ -111,7 +133,8 @@ The most practical current model is:
 - cohort: primary urgent / emergency same-episode first Gram-positive alert cohort
 - features: pruned `19`-feature set
 - models to report:
-  - Logistic Regression for interpretability
+  - Elastic Net Logistic for a compact interpretable linear model
+  - Random Forest for a strong clinically readable tree baseline
   - XGBoost for strongest ranking performance
 
 ## Files
@@ -119,6 +142,8 @@ The most practical current model is:
 - SHAP importance CSV: [s_aureus_same_episode_enriched_xgb_shap_importance.csv](/nfs/users/nfs_d/ds39/dosage_prediction/reports/s_aureus_same_episode_enriched_xgb_shap_importance.csv)
 - logistic coefficients CSV: [s_aureus_same_episode_enriched_logistic_coefficients.csv](/nfs/users/nfs_d/ds39/dosage_prediction/reports/s_aureus_same_episode_enriched_logistic_coefficients.csv)
 - pruned metrics JSON: [s_aureus_same_episode_pruned_metrics.json](/nfs/users/nfs_d/ds39/dosage_prediction/reports/s_aureus_same_episode_pruned_metrics.json)
+- model comparison report: [s_aureus_same_episode_model_comparison.md](/nfs/users/nfs_d/ds39/dosage_prediction/reports/s_aureus_same_episode_model_comparison.md)
+- model comparison JSON: [s_aureus_same_episode_model_comparison.json](/nfs/users/nfs_d/ds39/dosage_prediction/reports/s_aureus_same_episode_model_comparison.json)
 - SHAP figure: [xgb_shap_importance.png](/nfs/users/nfs_d/ds39/dosage_prediction/figures/s_aureus_same_episode/xgb_shap_importance.png)
 - coefficient figure: [logistic_coefficients.png](/nfs/users/nfs_d/ds39/dosage_prediction/figures/s_aureus_same_episode/logistic_coefficients.png)
 - correlation figure: [feature_correlation.png](/nfs/users/nfs_d/ds39/dosage_prediction/figures/s_aureus_same_episode/feature_correlation.png)

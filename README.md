@@ -76,6 +76,7 @@ Main files:
 - refined same-episode `S. aureus` report: [reports/s_aureus_same_episode_first_alert_report.md](reports/s_aureus_same_episode_first_alert_report.md)
 - enriched same-episode `S. aureus` report: [reports/s_aureus_same_episode_enriched_report.md](reports/s_aureus_same_episode_enriched_report.md)
 - feature-reduced `S. aureus` report: [reports/s_aureus_same_episode_feature_reduction_report.md](reports/s_aureus_same_episode_feature_reduction_report.md)
+- `S. aureus` model comparison: [reports/s_aureus_same_episode_model_comparison.md](reports/s_aureus_same_episode_model_comparison.md)
 - figures folder: [figures/primary_baseline](figures/primary_baseline)
 - clean baseline metrics JSON: [reports/blood_culture_primary_feature_metrics.json](reports/blood_culture_primary_feature_metrics.json)
 - pruned 18-feature metrics JSON: [reports/blood_culture_important_pruned_metrics.json](reports/blood_culture_important_pruned_metrics.json)
@@ -150,3 +151,4 @@ Current secondary analysis:
 - refined same-episode `S. aureus` prediction from the first Gram-positive alert, with single-organism and urgent/emergency cohort cleaning
 - enriched same-episode `S. aureus` model with process and prior-staphylococcal history features
 - feature-reduced same-episode `S. aureus` model using SHAP-style importance and correlation pruning
+- compact `19`-feature same-episode `S. aureus` comparison across Logistic Regression, Elastic Net, Random Forest, and XGBoost

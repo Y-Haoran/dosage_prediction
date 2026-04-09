@@ -35,8 +35,10 @@ Saved files:
 - enriched metrics: [reports/s_aureus_same_episode_enriched_metrics.json](../../reports/s_aureus_same_episode_enriched_metrics.json)
 - enriched trainer: [scripts/train_s_aureus_same_episode_enriched.py](../../scripts/train_s_aureus_same_episode_enriched.py)
 - feature reduction and clinical explanation: [reports/s_aureus_same_episode_feature_reduction_report.md](../../reports/s_aureus_same_episode_feature_reduction_report.md)
+- model comparison: [reports/s_aureus_same_episode_model_comparison.md](../../reports/s_aureus_same_episode_model_comparison.md)
 - explainability script: [scripts/analyze_s_aureus_same_episode_enriched.py](../../scripts/analyze_s_aureus_same_episode_enriched.py)
 - pruned trainer: [scripts/train_s_aureus_same_episode_pruned.py](../../scripts/train_s_aureus_same_episode_pruned.py)
+- comparison trainer: [scripts/train_s_aureus_same_episode_model_comparison.py](../../scripts/train_s_aureus_same_episode_model_comparison.py)
 
 Primary cohort counts:
 
@@ -72,21 +74,20 @@ Pruned primary cohort results:
 - Logistic Regression: AUROC `0.812`, AUPRC `0.672`, F1 `0.615`
 - XGBoost: AUROC `0.820`, AUPRC `0.707`, F1 `0.604`
 
-Sensitivity cohort:
+### Model Comparison
 
-- all single-organism first Gram-positive alerts
-- rows: `5,275`
-- `S. aureus` positives: `1,397`
+Using the same pruned `19` features and the same cohort split:
 
-Sensitivity held-out test results:
+- Random Forest: AUROC `0.814`, AUPRC `0.713`, F1 `0.619`
+- Elastic Net Logistic: AUROC `0.812`, AUPRC `0.672`, F1 `0.617`
+- Logistic Regression: AUROC `0.812`, AUPRC `0.672`, F1 `0.615`
+- XGBoost: AUROC `0.820`, AUPRC `0.707`, F1 `0.604`
 
-- Logistic Regression: AUROC `0.594`, F1 `0.465`
-- XGBoost: AUROC `0.631`, F1 `0.490`
+So the current message is:
 
-Sensitivity enriched results:
-
-- Logistic Regression: AUROC `0.761`, AUPRC `0.644`, F1 `0.565`
-- XGBoost: AUROC `0.811`, AUPRC `0.717`, F1 `0.632`
+- `XGBoost` is the best ranking model
+- `Random Forest` gives the best AUPRC and F1
+- `Elastic Net` keeps a compact linear baseline with almost the same performance as standard logistic regression
 
 ## Interpretation
 
@@ -136,4 +137,5 @@ Current takeaway:
 
 - keep the contaminant-vs-significant model as the primary project
 - use the refined same-episode `S. aureus` cohort as the better secondary analysis
+- highlight the current `19`-feature compact model family, not the earlier weaker exploratory runs
 - improve it next with device, source, and prior-staphylococcal context
