@@ -35,6 +35,7 @@ Saved files:
 - enriched metrics: [reports/s_aureus_same_episode_enriched_metrics.json](../../reports/s_aureus_same_episode_enriched_metrics.json)
 - enriched trainer: [scripts/train_s_aureus_same_episode_enriched.py](../../scripts/train_s_aureus_same_episode_enriched.py)
 - feature reduction and clinical explanation: [reports/s_aureus_same_episode_feature_reduction_report.md](../../reports/s_aureus_same_episode_feature_reduction_report.md)
+- key findings summary: [reports/s_aureus_same_episode_key_findings.md](../../reports/s_aureus_same_episode_key_findings.md)
 - model comparison: [reports/s_aureus_same_episode_model_comparison.md](../../reports/s_aureus_same_episode_model_comparison.md)
 - explainability script: [scripts/analyze_s_aureus_same_episode_enriched.py](../../scripts/analyze_s_aureus_same_episode_enriched.py)
 - pruned trainer: [scripts/train_s_aureus_same_episode_pruned.py](../../scripts/train_s_aureus_same_episode_pruned.py)
@@ -65,6 +66,16 @@ Primary cohort enriched results:
 - Logistic Regression: AUROC `0.807`, AUPRC `0.657`, F1 `0.589`
 - XGBoost: AUROC `0.817`, AUPRC `0.704`, F1 `0.606`
 
+### What We Learned
+
+The most positive scientific insight from this task is that the model became much stronger only after we added microbiology-aware features:
+
+- prior patient `S. aureus` history
+- draw-to-alert time
+- repeated pre-alert blood-culture drawing
+
+That tells us this problem is not mainly a generic physiology problem. It is a microbiology-process and prior-organism-history problem with supportive host-state signals.
+
 ### Feature Reduction
 
 We then used SHAP-style importance and correlation filtering to reduce the enriched model from `54` features to `19`.
@@ -88,6 +99,13 @@ So the current message is:
 - `XGBoost` is the best ranking model
 - `Random Forest` gives the best AUPRC and F1
 - `Elastic Net` keeps a compact linear baseline with almost the same performance as standard logistic regression
+
+### Positive Findings To Highlight
+
+- the refined same-episode dataset carries real signal across multiple model families
+- the model does not need a large opaque feature table; `19` features were enough
+- the most important features are clinically interpretable rather than arbitrary
+- the strongest signals point toward recurrence risk, microbiology process, and host acuity
 
 ## Interpretation
 

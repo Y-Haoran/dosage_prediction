@@ -76,6 +76,7 @@ Main files:
 - refined same-episode `S. aureus` report: [reports/s_aureus_same_episode_first_alert_report.md](reports/s_aureus_same_episode_first_alert_report.md)
 - enriched same-episode `S. aureus` report: [reports/s_aureus_same_episode_enriched_report.md](reports/s_aureus_same_episode_enriched_report.md)
 - feature-reduced `S. aureus` report: [reports/s_aureus_same_episode_feature_reduction_report.md](reports/s_aureus_same_episode_feature_reduction_report.md)
+- `S. aureus` key findings: [reports/s_aureus_same_episode_key_findings.md](reports/s_aureus_same_episode_key_findings.md)
 - `S. aureus` model comparison: [reports/s_aureus_same_episode_model_comparison.md](reports/s_aureus_same_episode_model_comparison.md)
 - figures folder: [figures/primary_baseline](figures/primary_baseline)
 - clean baseline metrics JSON: [reports/blood_culture_primary_feature_metrics.json](reports/blood_culture_primary_feature_metrics.json)
@@ -152,3 +153,9 @@ Current secondary analysis:
 - enriched same-episode `S. aureus` model with process and prior-staphylococcal history features
 - feature-reduced same-episode `S. aureus` model using SHAP-style importance and correlation pruning
 - compact `19`-feature same-episode `S. aureus` comparison across Logistic Regression, Elastic Net, Random Forest, and XGBoost
+
+Current positive takeaway from the `S. aureus` analysis:
+
+- the strongest gains came from microbiology-process and prior-staphylococcal-history features
+- the key signal stayed strong after reducing the model to `19` features
+- the signal is consistent across several ML model families, not just one algorithm
