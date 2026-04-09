@@ -1,159 +1,171 @@
-# Secondary Task: Early `S. aureus` Prioritization
+# Early Prioritization of Same-Episode `Staphylococcus aureus` at the First Gram-Positive Blood-Culture Alert
 
-## Why This Exists
+In `3,877` urgent/emergency single-organism first-alert admissions, a pruned `19`-feature model using pre-alert EHR plus microbiology-history features achieved AUROC `0.820` and AUPRC `0.707` with `XGBoost`. The main finding is that early `S. aureus` prioritization is driven more by microbiology-process context and prior organism history than by physiology alone.
 
-This folder describes a **secondary analysis**, not the main project.
+## Quick Read
 
-The main project in this repo remains:
+Question  
+At the first Gram-positive blood-culture alert, can pre-alert EHR and microbiology-history features identify which same-episode alerts will later finalize as `Staphylococcus aureus`?
 
-- first Gram-positive alert
-- predict clinically significant alert vs contaminant / low-significance alert
+Best current cohort  
+Urgent/emergency, single-organism, same-episode first Gram-positive alerts; `3,877` admissions, `1,021` `S. aureus` positives (`26.3%`).
 
-This secondary task asks a different question:
+Recommended current model  
+Pruned `19`-feature `XGBoost`: AUROC `0.820`, AUPRC `0.707`, F1 `0.604`.
 
-> At the first Gram-positive alert, which patients are more likely to have later-confirmed `Staphylococcus aureus` and should be prioritized for urgent review, repeat cultures, and source evaluation?
+Main scientific message  
+Performance improved sharply only after adding microbiology-aware process/history features, which shows this task is not mainly a generic physiology problem.
 
-## Refined Same-Episode Cohort
+## Clinical Vignette
 
-The cleaner version of this task is:
+One patient arrives unwell. A blood culture is drawn and later flags Gram-positive. At that moment the species is not yet finalized. This model estimates how likely that same blood-culture episode is to later finalize as `S. aureus`, so the team can prioritize urgent review, repeat cultures, source evaluation, and line or device assessment.
 
-> At the first Gram-positive blood-culture alert, can the prior 24 hours of routine data predict whether that same index blood-culture episode will later finalize as `Staphylococcus aureus` rather than another Gram-positive organism?
+## Cohort Flow
 
-Primary clean cohort:
+```text
+All blood cultures
+-> first Gram-positive blood-culture alert per admission
+-> exclude polymicrobial first-alert episodes
+-> keep urgent/emergency admissions
+-> tie the label to the same microbiology episode
+-> final analytic cohort: 3,877 rows, 1,021 S. aureus positives
+```
 
-- first Gram-positive alert per admission
-- same-episode species label
-- exclude polymicrobial first-alert episodes
-- focus first on urgent / emergency admissions
+## Official Current Result
 
-Saved files:
+This is the result readers should treat as the current best version of the secondary project.
 
-- [reports/s_aureus_same_episode_first_alert_metrics.json](../../reports/s_aureus_same_episode_first_alert_metrics.json)
-- [reports/s_aureus_same_episode_first_alert_report.md](../../reports/s_aureus_same_episode_first_alert_report.md)
-- [scripts/train_s_aureus_same_episode_first_alert.py](../../scripts/train_s_aureus_same_episode_first_alert.py)
-- enriched follow-up: [reports/s_aureus_same_episode_enriched_report.md](../../reports/s_aureus_same_episode_enriched_report.md)
-- enriched metrics: [reports/s_aureus_same_episode_enriched_metrics.json](../../reports/s_aureus_same_episode_enriched_metrics.json)
-- enriched trainer: [scripts/train_s_aureus_same_episode_enriched.py](../../scripts/train_s_aureus_same_episode_enriched.py)
-- feature reduction and clinical explanation: [reports/s_aureus_same_episode_feature_reduction_report.md](../../reports/s_aureus_same_episode_feature_reduction_report.md)
-- key findings summary: [reports/s_aureus_same_episode_key_findings.md](../../reports/s_aureus_same_episode_key_findings.md)
-- model comparison: [reports/s_aureus_same_episode_model_comparison.md](../../reports/s_aureus_same_episode_model_comparison.md)
-- explainability script: [scripts/analyze_s_aureus_same_episode_enriched.py](../../scripts/analyze_s_aureus_same_episode_enriched.py)
-- pruned trainer: [scripts/train_s_aureus_same_episode_pruned.py](../../scripts/train_s_aureus_same_episode_pruned.py)
-- comparison trainer: [scripts/train_s_aureus_same_episode_model_comparison.py](../../scripts/train_s_aureus_same_episode_model_comparison.py)
+- cohort: urgent/emergency, single-organism, same-episode first Gram-positive alerts
+- features: pruned `19`-feature set
+- official current model: `XGBoost`
+- best ranking result: AUROC `0.820`, AUPRC `0.707`, F1 `0.604`
 
-Primary cohort counts:
+Useful companion baselines on the same cohort and same `19` features:
 
-- rows: `3,877`
-- unique patients: `3,588`
-- `S. aureus` positives: `1,021`
-- prevalence: `26.3%`
+- `Random Forest`: AUROC `0.814`, AUPRC `0.713`, F1 `0.619`
+- `Elastic Net Logistic`: AUROC `0.812`, AUPRC `0.672`, F1 `0.617`
+- `Logistic Regression`: AUROC `0.812`, AUPRC `0.672`, F1 `0.615`
 
-Primary held-out test results:
-
-- Logistic Regression: AUROC `0.666`, F1 `0.459`
-- XGBoost: AUROC `0.640`, F1 `0.465`
-
-### Enriched Follow-up
-
-We then added:
-
-- draw-to-alert time
-- pre-alert blood-culture draw counts
-- prior patient history of positive `S. aureus`, CoNS, and any-staphylococcal blood cultures
-
-Primary cohort enriched results:
-
-- Logistic Regression: AUROC `0.807`, AUPRC `0.657`, F1 `0.589`
-- XGBoost: AUROC `0.817`, AUPRC `0.704`, F1 `0.606`
-
-### What We Learned
-
-The most positive scientific insight from this task is that the model became much stronger only after we added microbiology-aware features:
-
-- prior patient `S. aureus` history
-- draw-to-alert time
-- repeated pre-alert blood-culture drawing
-
-That tells us this problem is not mainly a generic physiology problem. It is a microbiology-process and prior-organism-history problem with supportive host-state signals.
-
-### Feature Reduction
-
-We then used SHAP-style importance and correlation filtering to reduce the enriched model from `54` features to `19`.
-
-Pruned primary cohort results:
-
-- Logistic Regression: AUROC `0.812`, AUPRC `0.672`, F1 `0.615`
-- XGBoost: AUROC `0.820`, AUPRC `0.707`, F1 `0.604`
-
-### Model Comparison
-
-Using the same pruned `19` features and the same cohort split:
-
-- Random Forest: AUROC `0.814`, AUPRC `0.713`, F1 `0.619`
-- Elastic Net Logistic: AUROC `0.812`, AUPRC `0.672`, F1 `0.617`
-- Logistic Regression: AUROC `0.812`, AUPRC `0.672`, F1 `0.615`
-- XGBoost: AUROC `0.820`, AUPRC `0.707`, F1 `0.604`
-
-So the current message is:
+Interpretation:
 
 - `XGBoost` is the best ranking model
-- `Random Forest` gives the best AUPRC and F1
-- `Elastic Net` keeps a compact linear baseline with almost the same performance as standard logistic regression
+- `Random Forest` gives the strongest AUPRC and F1
+- `Elastic Net` is the cleanest compact linear benchmark
 
-### Positive Findings To Highlight
+## What One Row Means
 
-- the refined same-episode dataset carries real signal across multiple model families
-- the model does not need a large opaque feature table; `19` features were enough
-- the most important features are clinically interpretable rather than arbitrary
-- the strongest signals point toward recurrence risk, microbiology process, and host acuity
+One row means:
 
-## Interpretation
+- one hospital admission
+- one first Gram-positive blood-culture alert
+- one same-episode final species label
 
-The refined same-episode cohort is the better scientific version of this task because:
+This is not:
 
-- the alert and the final `S. aureus` label belong to the same microbiology episode
-- polymicrobial first-alert episodes are removed from the primary analysis
-- urgent / emergency admissions are a cleaner first clinical subgroup
+- one row per bottle
+- one row per specimen forever
+- one row per patient forever
 
-The added process and prior-staph-history features materially improved performance, which supports the idea that this task is more microbiology- and history-driven than physiology-driven.
+## Final `19` Features
 
-The pruned `19`-feature model kept almost all of the enriched model’s performance, so the current signal is concentrated in a relatively small set of clinically interpretable features.
+### Microbiology History
 
-It should still remain a secondary analysis until we add source- and device-aware features, but it is now much more convincing than the earlier physiology-only version.
+- `prior_subject_s_aureus_positive_90d`
+- `prior_subject_s_aureus_positive_365d`
+- `prior_subject_cons_positive_90d`
+- `prior_subject_cons_positive_365d`
+- `prior_subject_any_staph_positive_365d`
+- `prior_positive_specimens_7d`
 
-## Why We Still Want To Work On It
+### Blood-Culture Process
 
-Even though the current baseline is modest, the task is still clinically meaningful because later-confirmed `S. aureus` often triggers a different level of urgency than generic Gram-positive bacteremia.
+- `index_hours_draw_to_alert`
+- `prealert_blood_culture_draws_7d`
+- `prealert_blood_culture_draws_24h`
+- `prealert_blood_culture_draws_6h`
 
-Potential value:
+### Host Context And Acuity
 
-- prioritize urgent microbiology review
-- prioritize repeat cultures
-- prioritize source investigation
-- prioritize line / device assessment
-- support faster recognition of patients who may need a more serious `S. aureus` workup
+- `anchor_age`
+- `in_icu_at_alert`
+- `vital_map_count_24h`
+- `vital_temperature_c_max_24h`
 
-## What Features We Need Next
+### Pre-Alert Labs
 
-If we continue this task, the next feature set should be richer than the current `41` features.
+- `lab_platelets_last_24h`
+- `lab_creatinine_last_24h`
+- `lab_creatinine_count_24h`
+- `lab_lactate_max_24h`
+- `lab_wbc_last_24h`
 
-The most important additions are:
+Important note:
+
+- no antibiotic feature survived into the final pruned `19`-feature set
+- the retained feature groups are dominated by microbiology history, microbiology process, and host acuity
+
+## Key Findings
+
+- the same-episode cohort is scientifically cleaner than the older broad admission-level `S. aureus` task because the alert and the final species label belong to the same microbiology pathway
+- generic physiology alone was not enough; the big performance jump came only after adding draw-to-alert time, blood-culture process counts, and prior staphylococcal history
+- the signal stayed strong after reducing from `54` to `19` features, which makes the model easier to explain clinically
+- the strongest features are clinically coherent rather than arbitrary: prior `S. aureus` history, faster positivity, repeated pre-alert blood-culture drawing, platelets, creatinine, and acuity
+- the result is robust across several model families, not only one algorithm
+
+## What This Is
+
+- a same-episode early prioritization model for `S. aureus` risk after the first Gram-positive blood-culture alert
+- a pre-alert risk score built from routine EHR data plus microbiology-process and microbiology-history features
+- a tool to support earlier review, repeat cultures, source search, and device assessment
+
+## What This Is Not
+
+- not a general sepsis predictor
+- not a contaminant classifier
+- not a replacement for final speciation
+- not an automatic treatment recommendation engine
+
+## Development History
+
+The final result came from three clear stages:
+
+1. Physiology-only same-episode baseline  
+   Logistic Regression AUROC `0.666`, XGBoost AUROC `0.640`
+
+2. Enriched microbiology-aware model  
+   Logistic Regression AUROC `0.807`, XGBoost AUROC `0.817`
+
+3. Pruned `19`-feature model  
+   Logistic Regression AUROC `0.812`, XGBoost AUROC `0.820`
+
+This development path is useful scientifically because it shows where the signal actually comes from:
+
+- not mainly from generic vitals and routine labs
+- mainly from microbiology-process context and prior organism history, with supportive host-state information
+
+## Current Limitations
+
+- this remains a secondary analysis, not the main project in the repo
+- device and source-aware features are still missing
+- prior MRSA-specific history is not yet separated cleanly
+- the model supports prioritization, not definitive action
+
+## Next Feature Priorities
 
 - central-line and device information
-- prior MRSA history, if recoverable safely
+- prior MRSA history where recoverable safely
 - infection-source clues
-- more microbiology context
-- targeted note information later, only if timing can be made leakage-safe
+- richer microbiology context
+- note-derived features only if timing can be made clearly leakage-safe
 
-These additions fit the biology of the question much better than vitals and routine labs alone.
+## Recommended Files
 
-## Bottom Line
-
-This `S. aureus` task is worth keeping because it is clinically meaningful, but the refined same-episode dataset should be the version readers look at first.
-
-Current takeaway:
-
-- keep the contaminant-vs-significant model as the primary project
-- use the refined same-episode `S. aureus` cohort as the better secondary analysis
-- highlight the current `19`-feature compact model family, not the earlier weaker exploratory runs
-- improve it next with device, source, and prior-staphylococcal context
+- current findings: [reports/s_aureus_same_episode_key_findings.md](../../reports/s_aureus_same_episode_key_findings.md)
+- model comparison: [reports/s_aureus_same_episode_model_comparison.md](../../reports/s_aureus_same_episode_model_comparison.md)
+- feature reduction: [reports/s_aureus_same_episode_feature_reduction_report.md](../../reports/s_aureus_same_episode_feature_reduction_report.md)
+- enriched metrics: [reports/s_aureus_same_episode_enriched_metrics.json](../../reports/s_aureus_same_episode_enriched_metrics.json)
+- pruned metrics: [reports/s_aureus_same_episode_pruned_metrics.json](../../reports/s_aureus_same_episode_pruned_metrics.json)
+- comparison metrics: [reports/s_aureus_same_episode_model_comparison.json](../../reports/s_aureus_same_episode_model_comparison.json)
+- enriched trainer: [scripts/train_s_aureus_same_episode_enriched.py](../../scripts/train_s_aureus_same_episode_enriched.py)
+- pruned trainer: [scripts/train_s_aureus_same_episode_pruned.py](../../scripts/train_s_aureus_same_episode_pruned.py)
+- comparison trainer: [scripts/train_s_aureus_same_episode_model_comparison.py](../../scripts/train_s_aureus_same_episode_model_comparison.py)

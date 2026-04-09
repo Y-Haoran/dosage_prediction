@@ -154,6 +154,12 @@ Current secondary analysis:
 - feature-reduced same-episode `S. aureus` model using SHAP-style importance and correlation pruning
 - compact `19`-feature same-episode `S. aureus` comparison across Logistic Regression, Elastic Net, Random Forest, and XGBoost
 
+Best current secondary `S. aureus` result:
+
+- urgent/emergency same-episode cohort: `3,877` admissions, `26.3%` `S. aureus`
+- pruned `19`-feature `XGBoost`: AUROC `0.820`, AUPRC `0.707`
+- polished overview: [secondary_tasks/s_aureus_first_alert/README.md](secondary_tasks/s_aureus_first_alert/README.md)
+
 Current positive takeaway from the `S. aureus` analysis:
 
 - the strongest gains came from microbiology-process and prior-staphylococcal-history features
