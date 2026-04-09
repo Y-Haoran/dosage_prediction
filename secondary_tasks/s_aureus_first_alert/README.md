@@ -13,22 +13,6 @@ This secondary task asks a different question:
 
 > At the first Gram-positive alert, which patients are more likely to have later-confirmed `Staphylococcus aureus` and should be prioritized for urgent review, repeat cultures, and source evaluation?
 
-That framing is more defensible than:
-
-- “predict `S. aureus` early so we can give more antibiotics”
-
-Why it is more defensible:
-
-- many clinicians already consider anti-MRSA coverage once a serious Gram-positive bloodstream infection is suspected
-- the more useful early value is often:
-  - faster senior review
-  - repeat blood cultures
-  - source search
-  - line assessment / removal decisions
-  - echocardiography or metastatic-infection workup when appropriate
-
-So this task should be read as a **prioritization** problem, not an automatic escalation rule.
-
 ## Current Cohort
 
 Using the current first-alert dataset:
